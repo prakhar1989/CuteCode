@@ -16,15 +16,16 @@ type Code struct {
 	UpdatedAt time.Time
 }
 
+//takes appengine Context and returns the datastore key
 func cutecodeKey(c appengine.Context) *datastore.Key {
 	return datastore.NewKey(c, "CuteCode", "default_cutecode", 0, nil)
 }
 
 func init() {
-	http.HandleFunc("/", handler)
-	http.HandleFunc("/signin", userHandler)
-	http.HandleFunc("/paste", codeHandler)
-	http.HandleFunc("/save", saveHandler)
+	http.HandleFunc("/", handler) //default handler
+	http.HandleFunc("/signin", userHandler) //if route param is signin then invoke userHandler
+	http.HandleFunc("/paste", codeHandler) //if route param is paste then invoke codeHandler
+	http.HandleFunc("/save", saveHandler) //if route param is save then invoke saveHandler
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
