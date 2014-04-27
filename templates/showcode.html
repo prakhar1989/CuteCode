@@ -1,12 +1,33 @@
 <html>
-<body>
-	<h2>Baby doll thinks that this is shittiest code she's even seen</h2>
-	<h4>{{.Title}}</h4>
-	<div>
-		<pre>{{.Content}}</pre>
-	</div>
+<head>
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
-	<p><a href="/paste">Try uploading cuter code</a></p>
-	<a href="/">Give up</a>
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<link rel="stylesheet" type="text/css" href="../resources/cute.css">
+</head>
+<body>
+<div id="container" class="container-fluid">
+	<div id="header" class="row-fluid">
+			<h1 align="center">CuteCode</h1>
+	</div>
+	<div id="title" class="row-fluid">
+		<h4>{{.Title}}</h4>
+	</div>
+	<div id="prettycode" class="row-fluid">
+		<pre class="prettyprint" >{{.Content}}</pre>
+	</div>
+	<div class="form-group">
+		<p class="well">
+			<a type="submit" href="/paste"  class="btn btn-primary btn-block">Share another snippet</a>
+			<a href="/" type="submit" class="btn btn-primary btn-block" >Home</a>
+		</p>
+	</div>
 </body>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 </html>

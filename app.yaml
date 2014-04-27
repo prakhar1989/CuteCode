@@ -1,5 +1,5 @@
 application: cutecodez
-version: 1
+version: 1 # enables rollback so do increment
 runtime: go
 api_version: go1
 
