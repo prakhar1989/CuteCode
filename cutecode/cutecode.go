@@ -16,6 +16,12 @@ type Code struct {
 	UpdatedAt time.Time
 }
 
+//caching of templates
+var indexTemplate = template.Must(template.ParseFiles("templates/layout.html","templates/index.html"))
+var signinTemplate = template.Must(template.ParseFiles("templates/layout.html","templates/signin.html"))
+var codeformTemplate = template.Must(template.ParseFiles("templates/layout.html","templates/codeform.html"))
+var showcodeTemplate = template.Must(template.ParseFiles("templates/layout.html","templates/showcode.html"))
+
 //takes appengine Context and returns the datastore key
 func cutecodeKey(c appengine.Context) *datastore.Key {
 	return datastore.NewKey(c, "CuteCode", "default_cutecode", 0, nil)
@@ -28,6 +34,7 @@ func init() {
 	http.HandleFunc("/save", saveHandler) //if route param is save then invoke saveHandler
 }
 
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	q := datastore.NewQuery("CuteCode").Ancestor(cutecodeKey(c)).Order("-CreatedAt").Limit(10)
@@ -37,9 +44,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	t, _ := template.ParseFiles("templates/index.html")
-	t.Execute(w, codes)
+	err:=indexTemplate.ExecuteTemplate(w,"layout", codes) //this mention of layout stems from the {{layout}} of the layout page. for more http://blog.xcai.net/golang/templates
+	if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,19 +63,21 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusFound)
 		return
 	}
-	t, _ := template.ParseFiles("templates/signin.html")
-	t.Execute(w, nil)
+	err := signinTemplate.ExecuteTemplate(w, "layout", nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func codeHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("templates/codeform.html")
-	t.Execute(w, nil)
+	err := codeformTemplate.ExecuteTemplate(w, "layout", nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-
-	t, _ := template.ParseFiles("templates/showcode.html")
 	code := Code{
 		Title:   r.FormValue("title"),
 		Content: r.FormValue("content"),
@@ -79,5 +89,8 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	t.Execute(w, &code)
+	templerr := showcodeTemplate.ExecuteTemplate(w,"layout", &code)
+	if templerr != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
