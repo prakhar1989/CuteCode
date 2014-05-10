@@ -1,21 +1,8 @@
 {{define "content"}}
-<body>
-<div id="container" class="container-fluid">
-	<div id="header" class="row-fluid">
-			<h1 align="center">CuteCode</h1>
-	</div>
-	<div id="title" class="row-fluid">
-		<h4>{{.Title}}</h4>
-	</div>
-	<div id="prettycode" class="row-fluid">
-		<pre class="prettyprint" >{{.Content}}</pre>
-	</div>
-	<div class="form-group">
-		<p class="well">
-			<a type="submit" href="/paste"  class="btn btn-primary btn-block">Share another snippet</a>
-			<a href="/" type="submit" class="btn btn-primary btn-block" >Home</a>
-		</p>
-	</div>
-</body>
-<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+<div id="title">
+    <h4>{{.Title}}</h4>
+</div>
+<div id="prettycode">
+    <pre>{{.Content}}</pre>
+</div>
 {{end}}

@@ -11,6 +11,8 @@ import (
 type Code struct {
 	Title     string
 	Content   string
+	UrlKey    string
+	Lang      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -26,6 +28,7 @@ func cutecodeKey(c appengine.Context) *datastore.Key {
 func init() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/save", saveHandler)
+	http.HandleFunc("/show", showHandler)
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 }
 
@@ -34,15 +37,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	c := appengine.NewContext(r)
-	q := datastore.NewQuery("CuteCode").Ancestor(cutecodeKey(c)).Order("-CreatedAt").Limit(10)
-
-	codes := make([]Code, 0, 10)
-	if _, err := q.GetAll(c, &codes); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err := indexTemplate.ExecuteTemplate(w, "layout", codes)
+	err := indexTemplate.ExecuteTemplate(w, "layout", nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -53,16 +48,29 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	code := Code{
 		Title:   r.FormValue("title"),
 		Content: r.FormValue("content"),
+		Lang:    r.FormValue("lang"),
 	}
 
-	key := datastore.NewIncompleteKey(c, "CuteCode", cutecodeKey(c))
-	_, err := datastore.Put(c, key, &code)
+	_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "CuteCode", cutecodeKey(c)), &code)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	templerr := showcodeTemplate.ExecuteTemplate(w, "layout", &code)
-	if templerr != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	templateerr := showcodeTemplate.ExecuteTemplate(w, "layout", &code)
+	if templateerr != nil {
+		http.Error(w, templateerr.Error(), http.StatusInternalServerError)
 	}
+}
+
+func showHandler(w http.ResponseWriter, r *http.Request) {
+    code := Code{
+		Title:   "Hello",
+		Content: "Bello",
+		Lang:    "Go",
+    }
+
+    templateerr := showcodeTemplate.ExecuteTemplate(w, "layout", &code)
+    if templateerr != nil {
+        http.Error(w, templateerr.Error(), http.StatusInternalServerError)
+    }
 }
