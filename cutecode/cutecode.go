@@ -10,7 +10,8 @@ import (
 
 type Code struct {
 	Title     string
-	Content   string
+	Content   []byte
+	Html      template.HTML
 	UrlKey    string
 	Lang      string
 	CreatedAt time.Time
@@ -47,7 +48,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	code := Code{
 		Title:   r.FormValue("title"),
-		Content: r.FormValue("content"),
+		Content: []byte(r.FormValue("content")),
 		Lang:    r.FormValue("lang"),
 	}
 
@@ -56,21 +57,18 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+    http.Redirect(w, r, "/show", http.StatusFound)
+}
+
+func showHandler(w http.ResponseWriter, r *http.Request) {
+	code := Code{
+		Title:   "Hello",
+		Content: []byte("Real code should go here"),
+		Lang:    "Go",
+	}
+    code.Html = template.HTML(code.Content)
 	templateerr := showcodeTemplate.ExecuteTemplate(w, "layout", &code)
 	if templateerr != nil {
 		http.Error(w, templateerr.Error(), http.StatusInternalServerError)
 	}
-}
-
-func showHandler(w http.ResponseWriter, r *http.Request) {
-    code := Code{
-		Title:   "Hello",
-		Content: "Bello",
-		Lang:    "Go",
-    }
-
-    templateerr := showcodeTemplate.ExecuteTemplate(w, "layout", &code)
-    if templateerr != nil {
-        http.Error(w, templateerr.Error(), http.StatusInternalServerError)
-    }
 }
